@@ -14,6 +14,7 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import expressServer from './server';
 
 class AppUpdater {
   constructor() {
@@ -82,6 +83,11 @@ const createWindow = async () => {
   });
 
   mainWindow.loadURL(resolveHtmlPath('index.html'));
+
+  // start the server
+  expressServer.listen(3000, () => {
+    console.log('server started at http://localhost:3000');
+  });
 
   mainWindow.on('ready-to-show', () => {
     if (!mainWindow) {
