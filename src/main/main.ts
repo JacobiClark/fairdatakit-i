@@ -12,6 +12,7 @@ import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import fs from 'fs';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import expressServer from './server';
@@ -26,7 +27,41 @@ class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
+// Create the fairdatakit folder in the user's app data folder
+const userDataPath = app.getPath('userData');
+const fairdatakitSavePath = path.join(userDataPath, 'fairdatakit');
+if (!fs.existsSync(fairdatakitSavePath)) {
+  fs.mkdirSync(fairdatakitSavePath);
+}
+const fairdatakitConfigPath = path.join(fairdatakitSavePath, 'config.json');
+if (!fs.existsSync(fairdatakitConfigPath)) {
+  fs.writeFileSync(fairdatakitConfigPath, JSON.stringify({}));
+}
+// Create a folder called schemas in the fairdatakit folder if it doesn't exist
+const fairDataKitSchemasPath = path.join(fairdatakitSavePath, 'schemas');
+if (!fs.existsSync(fairDataKitSchemasPath)) {
+  fs.mkdirSync(fairDataKitSchemasPath);
+}
+
+const fairDataKitDatasetsPath = path.join(fairdatakitSavePath, 'datasets');
+if (!fs.existsSync(fairDataKitDatasetsPath)) {
+  fs.mkdirSync(fairDataKitDatasetsPath);
+}
+
+ipcMain.on('get-dataset-names', async (event, arg) => {
+  try {
+    const datasetNames = await fs.promises.readdir(fairDataKitDatasetsPath);
+    event.reply('get-dataset-names', datasetNames);
+  } catch (e) {
+    console.log(e);
+  }
+});
+
 ipcMain.on('ipc-example', async (event, arg) => {
+  if (!userDataPath) {
+    throw new Error('userDataPath is not defined');
+  }
+  console.log(`userDataPath: ${userDataPath}`);
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
   console.log(msgTemplate(arg));
   event.reply('ipc-example', msgTemplate('pong'));
