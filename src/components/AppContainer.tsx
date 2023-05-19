@@ -135,7 +135,7 @@ export default function AppContainer({ children }: AppContainerProps) {
         <Divider />
         <List>
           {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-            <Link to={index % 2 === 0 ? 'files' : 'metadata'}>
+            <Link to={index % 2 === 0 ? 'datasets' : 'metadata'}>
               <ListItem key={text} disablePadding>
                 <ListItemButton>
                   <ListItemIcon>

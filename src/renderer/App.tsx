@@ -1,18 +1,17 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import AppContainer from '../components/AppContainer';
+import Home from '../components/Home';
+import PingPong from '../components/PingPong';
 import './App.css';
 
-function Home() {
-  return <div>Home</div>;
-}
 export default function App() {
   return (
     <Router>
       <AppContainer>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/files" element={<Home />} />
-          <Route path="/metadata" element={<div>a</div>} />
+          <Route path="/datasets" element={<Home />} />
+          <Route path="/metadata" element={<PingPong />} />
         </Routes>
       </AppContainer>
     </Router>

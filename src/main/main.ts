@@ -48,13 +48,23 @@ if (!fs.existsSync(fairDataKitDatasetsPath)) {
   fs.mkdirSync(fairDataKitDatasetsPath);
 }
 
-ipcMain.on('get-dataset-names', async (event, arg) => {
+ipcMain.on('get-dataset-names', async (event) => {
   try {
     const datasetNames = await fs.promises.readdir(fairDataKitDatasetsPath);
     event.reply('get-dataset-names', datasetNames);
   } catch (e) {
     console.log(e);
   }
+});
+
+ipcMain.on('ping-pong', async (event, args) => {
+  console.log(args);
+  event.reply('ping-pong', ['pong']);
+});
+
+ipcMain.handle('show-open-dialog', async (event, options) => {
+  const result = await dialog.showOpenDialog(options);
+  return result;
 });
 
 ipcMain.on('ipc-example', async (event, arg) => {
