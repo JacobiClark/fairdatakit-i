@@ -26,7 +26,7 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
   open?: boolean;
 }>(({ theme, open }) => ({
   height: 'calc(100vh - 64px)',
-  width: '100%',
+  width: `calc(100vw - ${drawerWidth}px)`,
   marginTop: '64px',
   flexGrow: 1,
   overflow: 'auto',
@@ -81,7 +81,7 @@ interface AppContainerProps {
 
 export default function AppContainer({ children }: AppContainerProps) {
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(true);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -134,12 +134,12 @@ export default function AppContainer({ children }: AppContainerProps) {
         </DrawerHeader>
         <Divider />
         <List>
-          {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-            <Link to={index % 2 === 0 ? 'datasets' : 'metadata'}>
+          {['Administrate', 'Curate'].map((text) => (
+            <Link to={text}>
               <ListItem key={text} disablePadding>
                 <ListItemButton>
                   <ListItemIcon>
-                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                    {text === 'Administrate' ? <InboxIcon /> : <MailIcon />}
                   </ListItemIcon>
                   <ListItemText primary={text} />
                 </ListItemButton>

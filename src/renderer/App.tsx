@@ -1,7 +1,9 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import AppContainer from '../components/AppContainer';
 import Home from '../components/Home';
-import PingPong from '../components/PingPong';
+import CurateHome from '../components/CurateHome';
+import CurateMetadata from '../components/CurateMetadata';
+
 import './App.css';
 
 export default function App() {
@@ -10,8 +12,8 @@ export default function App() {
       <AppContainer>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/datasets" element={<Home />} />
-          <Route path="/metadata" element={<PingPong />} />
+          <Route path="/Curate" element={<CurateHome />} />
+          <Route path="/Curate/Metadata" element={<Home />} />
         </Routes>
       </AppContainer>
     </Router>
