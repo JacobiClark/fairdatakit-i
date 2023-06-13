@@ -9,7 +9,7 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, dialog } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import fs from 'fs';
@@ -47,6 +47,39 @@ const fairDataKitDatasetsPath = path.join(fairdatakitSavePath, 'datasets');
 if (!fs.existsSync(fairDataKitDatasetsPath)) {
   fs.mkdirSync(fairDataKitDatasetsPath);
 }
+
+const generateTreeStructure = (folderPath: string) => {
+  const createNode = (name: string, path: string, children: any) => {
+    return {
+      name,
+      path,
+      children,
+    };
+  };
+
+  const createTree = (folderPath: string) => {
+    const folder = fs.readdirSync(folderPath);
+    const children = folder.map((child) => {
+      const childPath = path.join(folderPath, child);
+      if (fs.lstatSync(childPath).isDirectory()) {
+        return createTree(childPath);
+      }
+      return createNode(child, childPath, []);
+    });
+    return createNode(folderPath, folderPath, children);
+  };
+
+  return createTree(folderPath);
+};
+
+ipcMain.on('open-folder-dialog', async (event, args) => {
+  const result = await dialog.showOpenDialog({
+    properties: ['openDirectory'],
+  });
+  const tree = generateTreeStructure(result.filePaths[0]);
+  console.log('tree', tree);
+  event.reply('open-folder-dialog', tree);
+});
 
 ipcMain.on('get-dataset-names', async (event) => {
   try {

@@ -8,7 +8,12 @@ function CurateHome() {
       <h1>Home Page</h1>
       <Link to="/Curate/Metadata">
         <Button variant="contained" color="primary">
-          Link
+          Metadata
+        </Button>
+      </Link>
+      <Link to="/Curate/dataset">
+        <Button variant="contained" color="primary">
+          Dataset
         </Button>
       </Link>
     </>

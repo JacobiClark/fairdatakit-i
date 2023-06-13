@@ -8,7 +8,8 @@ export type Channels =
   | 'ipc-example'
   | 'get-dataset-names'
   | 'show-open-dialog'
-  | 'ping-pong';
+  | 'ping-pong'
+  | 'open-folder-dialog';
 
 // Create an object that exposes IPC-related functionality
 const electronHandler = {
