@@ -13,7 +13,7 @@ export default function App() {
     <Router>
       <AppContainer>
         <Routes>
-          <Route path="/" element={<MetadataForm />} />
+          <Route path="/" element={<DatasetForm />} />
 
           <Route path="/Curate" element={<CurateHome />} />
           <Route path="/Curate/Metadata" element={<MetadataForm />} />

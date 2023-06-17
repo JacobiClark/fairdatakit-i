@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TreeItem, TreeView } from '@mui/lab';
-import { Button } from '@mui/material';
+import { Button, Menu, MenuItem } from '@mui/material';
 import Typography from '@mui/material/Typography';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -13,14 +13,16 @@ interface FolderStructure {
 }
 
 function DatasetForm() {
-  const [folderStructure, setFolderStructure] = useState({});
+  const [folderStructure, setFolderStructure] =
+    useState<FolderStructure | null>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleSendMessage = () => {
     window.electron.ipcRenderer.sendMessage('open-folder-dialog', []);
   };
 
   useEffect(() => {
-    const handleDatasetStructureMessage = (args) => {
+    const handleDatasetStructureMessage = (args: FolderStructure) => {
       setFolderStructure(args);
     };
 
@@ -30,11 +32,27 @@ function DatasetForm() {
     );
   }, []);
 
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleContextMenu = (event: React.MouseEvent<HTMLElement>) => {
+    event.preventDefault();
+    setAnchorEl(event.currentTarget);
+  };
+
   const renderTree = (nodes: FolderStructure) => (
-    <TreeItem key={nodes.path} nodeId={nodes.path} label={nodes.name}>
-      {Array.isArray(nodes.children)
-        ? nodes.children.map((node) => renderTree(node))
-        : null}
+    <TreeItem
+      key={nodes.path}
+      nodeId={nodes.path}
+      label={nodes.relativePath}
+      onContextMenu={handleContextMenu}
+    >
+      {nodes.children.map((node) => renderTree(node))}
     </TreeItem>
   );
 
@@ -60,6 +78,16 @@ function DatasetForm() {
       <button type="button" onClick={handleSendMessage}>
         Send IPC Message
       </button>
+      <Menu
+        id="context-menu"
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+      >
+        <MenuItem onClick={handleClose}>Option 1</MenuItem>
+        <MenuItem onClick={handleClose}>Option 2</MenuItem>
+        <MenuItem onClick={handleClose}>Option 3</MenuItem>
+      </Menu>
     </>
   );
 }

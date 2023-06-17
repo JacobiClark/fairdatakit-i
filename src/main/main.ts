@@ -48,28 +48,45 @@ if (!fs.existsSync(fairDataKitDatasetsPath)) {
   fs.mkdirSync(fairDataKitDatasetsPath);
 }
 
-const generateTreeStructure = (folderPath: string) => {
-  const createNode = (name: string, path: string, children: any) => {
-    return {
-      name,
-      path,
-      children,
-    };
+const createNode = (relativePath, name, path, children) => {
+  return {
+    relativePath,
+    name,
+    path,
+    children,
   };
+};
 
-  const createTree = (folderPath: string) => {
-    const folder = fs.readdirSync(folderPath);
-    const children = folder.map((child) => {
-      const childPath = path.join(folderPath, child);
-      if (fs.lstatSync(childPath).isDirectory()) {
-        return createTree(childPath);
-      }
-      return createNode(child, childPath, []);
-    });
-    return createNode(folderPath, folderPath, children);
-  };
+const createTree = (relativePath, folderPath) => {
+  const folder = fs.readdirSync(folderPath);
+  const children = folder.map((child) => {
+    const childPath = path.join(folderPath, child);
+    // If the child is a folder, recursively create a tree for it
+    if (fs.lstatSync(childPath).isDirectory()) {
+      // Get the name of the child folder
+      const childFolderName = path.basename(childPath);
+      const childFolderVirtualPath = `${relativePath}/${childFolderName}`;
+      return createTree(childFolderVirtualPath, childPath);
+    }
 
-  return createTree(folderPath);
+    // If the child is a file, create a node for it
+    // Get the name of the child file
+    const childFileName = path.basename(childPath);
+    const childFileVirtualPath = `${relativePath}/${childFileName}`;
+    return createNode(childFileVirtualPath, child, childPath, []);
+  });
+
+  return createNode(
+    relativePath,
+    path.basename(folderPath),
+    folderPath,
+    children
+  );
+};
+
+const generateTreeStructure = (folderPath) => {
+  const baseFolderName = path.basename(folderPath);
+  return [createTree(`${baseFolderName}`, folderPath)];
 };
 
 ipcMain.on('open-folder-dialog', async (event, args) => {
@@ -77,17 +94,8 @@ ipcMain.on('open-folder-dialog', async (event, args) => {
     properties: ['openDirectory'],
   });
   const tree = generateTreeStructure(result.filePaths[0]);
-  console.log('tree', tree);
+  console.log('tree', JSON.stringify(tree, null, 2));
   event.reply('open-folder-dialog', tree);
-});
-
-ipcMain.on('get-dataset-names', async (event) => {
-  try {
-    const datasetNames = await fs.promises.readdir(fairDataKitDatasetsPath);
-    event.reply('get-dataset-names', datasetNames);
-  } catch (e) {
-    console.log(e);
-  }
 });
 
 ipcMain.on('ping-pong', async (event, args) => {
