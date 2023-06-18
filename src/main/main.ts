@@ -27,26 +27,27 @@ class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
-// Create the fairdatakit folder in the user's app data folder
-const userDataPath = app.getPath('userData');
-const fairdatakitSavePath = path.join(userDataPath, 'fairdatakit');
-if (!fs.existsSync(fairdatakitSavePath)) {
-  fs.mkdirSync(fairdatakitSavePath);
-}
-const fairdatakitConfigPath = path.join(fairdatakitSavePath, 'config.json');
-if (!fs.existsSync(fairdatakitConfigPath)) {
-  fs.writeFileSync(fairdatakitConfigPath, JSON.stringify({}));
-}
-// Create a folder called schemas in the fairdatakit folder if it doesn't exist
-const fairDataKitSchemasPath = path.join(fairdatakitSavePath, 'schemas');
-if (!fs.existsSync(fairDataKitSchemasPath)) {
-  fs.mkdirSync(fairDataKitSchemasPath);
-}
+const instantiateDirectories = () => {
+  const dirs = ['datasets', 'schemas', 'config.json'];
+  const userDataPath = app.getPath('userData');
+  const fairdatakitSavePath = path.join(userDataPath, 'fairdatakit');
+  if (!fs.existsSync(fairdatakitSavePath)) {
+    fs.mkdirSync(fairdatakitSavePath);
+  }
 
-const fairDataKitDatasetsPath = path.join(fairdatakitSavePath, 'datasets');
-if (!fs.existsSync(fairDataKitDatasetsPath)) {
-  fs.mkdirSync(fairDataKitDatasetsPath);
-}
+  const exposeDirectories = {};
+  dirs.forEach((directory) => {
+    const directoryPath = path.join(fairdatakitSavePath, directory);
+    if (!fs.existsSync(directoryPath)) {
+      fs.mkdirSync(directoryPath);
+    }
+    exposeDirectories[directory] = directoryPath;
+  });
+  return exposeDirectories;
+};
+
+const fdkDirectories = instantiateDirectories();
+console.log('fdkDirectories', fdkDirectories);
 
 const createNode = (relativePath, name, path, children) => {
   return {
@@ -109,10 +110,6 @@ ipcMain.handle('show-open-dialog', async (event, options) => {
 });
 
 ipcMain.on('ipc-example', async (event, arg) => {
-  if (!userDataPath) {
-    throw new Error('userDataPath is not defined');
-  }
-  console.log(`userDataPath: ${userDataPath}`);
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
   console.log(msgTemplate(arg));
   event.reply('ipc-example', msgTemplate('pong'));
