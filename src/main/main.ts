@@ -16,6 +16,9 @@ import fs from 'fs';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import expressServer from './server';
+import { v4 as uuid } from 'uuid';
+
+console.log('uuid', uuid());
 
 class AppUpdater {
   constructor() {
