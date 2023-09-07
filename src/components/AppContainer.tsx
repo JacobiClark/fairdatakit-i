@@ -18,6 +18,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
+import { IconFolderPlus } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 
 const drawerWidth = 240;
@@ -25,6 +26,8 @@ const drawerWidth = 240;
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
   open?: boolean;
 }>(({ theme, open }) => ({
+  display: 'flex',
+  flexDirection: 'column',
   height: 'calc(100vh - 64px)',
   width: `calc(100vw - ${drawerWidth}px)`,
   marginTop: '64px',
@@ -78,6 +81,16 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 interface AppContainerProps {
   children: React.ReactNode;
 }
+
+type IconMapping = {
+  [key: string]: React.ReactNode;
+};
+
+const iconMapping: IconMapping = {
+  Administrate: <InboxIcon />,
+  Curate: <MailIcon />,
+  'Generate test dataset': <IconFolderPlus />,
+};
 
 export default function AppContainer({ children }: AppContainerProps) {
   const theme = useTheme();
@@ -134,13 +147,11 @@ export default function AppContainer({ children }: AppContainerProps) {
         </DrawerHeader>
         <Divider />
         <List>
-          {['Administrate', 'Curate'].map((text) => (
-            <Link to={text}>
+          {['Administrate', 'Curate', 'Generate test dataset'].map((text) => (
+            <Link to={text.replace(/ /g, '-').toLowerCase()}>
               <ListItem key={text} disablePadding>
                 <ListItemButton>
-                  <ListItemIcon>
-                    {text === 'Administrate' ? <InboxIcon /> : <MailIcon />}
-                  </ListItemIcon>
+                  <ListItemIcon>{iconMapping[text]}</ListItemIcon>
                   <ListItemText primary={text} />
                 </ListItemButton>
               </ListItem>

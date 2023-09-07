@@ -6,12 +6,12 @@ function CurateHome() {
   return (
     <>
       <h1>Home Page</h1>
-      <Link to="/Curate/Metadata">
+      <Link to="/curate/Metadata">
         <Button variant="contained" color="primary">
           Metadata
         </Button>
       </Link>
-      <Link to="/Curate/dataset">
+      <Link to="/curate/dataset">
         <Button variant="contained" color="primary">
           Dataset
         </Button>

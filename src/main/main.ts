@@ -11,11 +11,14 @@
 import path from 'path';
 import { app, BrowserWindow, shell, ipcMain, dialog } from 'electron';
 import { autoUpdater } from 'electron-updater';
+import Store from 'electron-store';
 import log from 'electron-log';
 import fs from 'fs';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import expressServer from './server';
+
+import { userConfig } from '../stores/userConfig';
 
 class AppUpdater {
   constructor() {
@@ -98,6 +101,13 @@ ipcMain.on('open-folder-dialog', async (event, args) => {
   event.reply('open-folder-dialog', tree);
 });
 
+ipcMain.on('open-folder-select', async (event, args) => {
+  const result = await dialog.showOpenDialog({
+    properties: ['openDirectory'],
+  });
+  event.reply('open-folder-select', result.filePaths[0]);
+});
+
 ipcMain.on('ping-pong', async (event, args) => {
   console.log(args);
   event.reply('ping-pong', ['pong']);
@@ -116,6 +126,30 @@ ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
   console.log(msgTemplate(arg));
   event.reply('ipc-example', msgTemplate('pong'));
+});
+
+const DatasetStore = new Store({
+  cwd: fairDataKitDatasetsPath,
+  name: 'datasets',
+});
+ipcMain.on('get-datasets', async (event) => {
+  const datasets = DatasetStore.store;
+  event.reply('get-datasets', datasets);
+});
+ipcMain.on('add-dataset', async (event, args) => {
+  const { datasetName } = args;
+  const { datasetPath } = args;
+  DatasetStore.set(datasetName, {
+    name: datasetName,
+    path: datasetPath,
+  });
+  const datasets = DatasetStore.store;
+  event.reply('get-datasets', datasets);
+});
+ipcMain.on('delete-dataset', async (event, datasetName) => {
+  DatasetStore.delete(datasetName);
+  const datasets = DatasetStore.store;
+  event.reply('get-datasets', datasets);
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -155,11 +189,14 @@ const createWindow = async () => {
   const getAssetPath = (...paths: string[]): string => {
     return path.join(RESOURCES_PATH, ...paths);
   };
-
+  // show: false,
+  // width: 1024, DEFAULTS (NO X OR Y)
+  // height: 728,
   mainWindow = new BrowserWindow({
-    show: false,
-    width: 1024,
-    height: 728,
+    width: 1600,
+    height: 1000,
+    x: 1800,
+    y: 0,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged
