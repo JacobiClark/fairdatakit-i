@@ -17,8 +17,11 @@ import fs from 'fs';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import expressServer from './server';
-
-import { userConfig } from '../stores/userConfig';
+import {
+  userConfig,
+  setDefaultTestDatasetPath,
+  getDefaultTestDatasetPath,
+} from '../stores/userConfig';
 
 class AppUpdater {
   constructor() {
@@ -92,6 +95,11 @@ const generateTreeStructure = (folderPath) => {
   return [createTree(`${baseFolderName}`, folderPath)];
 };
 
+ipcMain.on('get-test-dataset-save-path', async (event) => {
+  const testDatasetSavePath = userConfig.get('testDatasetSavePath');
+  event.reply('get-test-dataset-save-path', testDatasetSavePath);
+});
+
 ipcMain.on('open-folder-dialog', async (event, args) => {
   const result = await dialog.showOpenDialog({
     properties: ['openDirectory'],
@@ -101,31 +109,28 @@ ipcMain.on('open-folder-dialog', async (event, args) => {
   event.reply('open-folder-dialog', tree);
 });
 
-ipcMain.on('open-folder-select', async (event, args) => {
-  const result = await dialog.showOpenDialog({
-    properties: ['openDirectory'],
-  });
-  event.reply('open-folder-select', result.filePaths[0]);
-});
+ipcMain.on(
+  'open-single-folder-select-test-dataset-save-path',
+  async (event) => {
+    const result = await dialog.showOpenDialog({
+      properties: ['openDirectory'],
+    });
+    setDefaultTestDatasetPath(result.filePaths[0]);
+    event.reply(
+      `open-single-folder-select-test-dataset-save-path`,
+      result.filePaths[0]
+    );
+  }
+);
 
-ipcMain.on('ping-pong', async (event, args) => {
-  console.log(args);
-  event.reply('ping-pong', ['pong']);
+ipcMain.on('get-test-dataset-save-path', async (event) => {
+  const testDaasetPath = getDefaultTestDatasetPath();
+  event.reply('get-test-dataset-save-path', testDaasetPath);
 });
 
 ipcMain.handle('show-open-dialog', async (event, options) => {
   const result = await dialog.showOpenDialog(options);
   return result;
-});
-
-ipcMain.on('ipc-example', async (event, arg) => {
-  if (!userDataPath) {
-    throw new Error('userDataPath is not defined');
-  }
-  console.log(`userDataPath: ${userDataPath}`);
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
 });
 
 const DatasetStore = new Store({

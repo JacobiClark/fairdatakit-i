@@ -10,14 +10,6 @@ import ListItem from '@mui/material/ListItem';
 import Avatar from '@mui/material/Avatar';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemText from '@mui/material/ListItemText';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-
 import FolderSelectDialog from './FolderSelectDialog';
 import DatasetCustomizationDialog from './DatasetCustomizationDialog';
 
@@ -26,15 +18,55 @@ const dummyDatasets = [
   { name: 'Dataset 2', description: 'This is a description of dataset 2' },
   { name: 'Dataset 3', description: 'This is a description of dataset 3' },
 ];
+
 function GenerateTestDatasetHome() {
   const [folderSelectOpen, setFolderSelectOpen] = useState(false);
   const [datasetCustomizationOpen, setDatasetCustomizationOpen] =
     useState(false);
   const [selectedFolderPath, setSelectedFolderPath] = useState('');
 
-  const handleFolderSelectOpen = () => {
-    setFolderSelectOpen(true);
+  const openGenerateTestDatasetConfigDialogue = () => {
+    setDatasetCustomizationOpen(true);
   };
+
+  // IPC Functions
+  const openDefaultDatasetSavePath = () => {
+    window.electron.ipcRenderer.sendMessage(
+      'open-single-folder-select-test-dataset-save-path',
+      []
+    );
+  };
+
+  useEffect(() => {
+    // IPC Event Handler to set the selected folder path
+    const setTestDatasetSavePath = (selectedDatasetPath: String) => {
+      setSelectedFolderPath(selectedDatasetPath);
+    };
+
+    window.electron.ipcRenderer.on(
+      'open-single-folder-select-test-dataset-save-path',
+      setTestDatasetSavePath
+    );
+  }, []);
+
+  useEffect(() => {
+    // Get the default test dataset path from main and set it
+    const getTestDatasetSavePath = () => {
+      window.electron.ipcRenderer.sendMessage('get-test-dataset-save-path', []);
+    };
+
+    getTestDatasetSavePath();
+
+    const setTestDatasetSavePath = (args) => {
+      setSelectedFolderPath(args);
+    };
+
+    window.electron.ipcRenderer.on(
+      'get-test-dataset-save-path',
+      setTestDatasetSavePath
+    );
+  }, []);
+
   const handleFolderSelectClose = () => {
     setFolderSelectOpen(false);
   };
@@ -43,70 +75,37 @@ function GenerateTestDatasetHome() {
     setFolderSelectOpen(false);
     setDatasetCustomizationOpen(true);
   };
+
   const handleDatasetCustomizationClose = () => {
     setDatasetCustomizationOpen(false);
   };
-
-  const handleGetDatasetsButtonClick = () => {
-    window.electron.ipcRenderer.sendMessage('get-datasets', []);
-  };
-
-  const handleAddDatasetsButtonClick = () => {
-    window.electron.ipcRenderer.sendMessage('add-dataset', {
-      datasetName: 'Test dataset',
-      datasetPath: 'This is a test dataset',
-    });
-  };
-
-  const handleFolderSelectButtonClick = () => {
-    window.electron.ipcRenderer.sendMessage('open-folder-select', []);
-  };
-
-  useEffect(() => {
-    const handleDatasetStructureMessage = (args) => {
-      setSelectedFolderPath(args);
-    };
-
-    window.electron.ipcRenderer.on(
-      'open-folder-select',
-      handleDatasetStructureMessage
-    );
-  }, []);
-
-  useEffect(() => {
-    const handleDatasetNameMessage = (args) => {
-      console.log(args);
-    };
-
-    window.electron.ipcRenderer.on('get-datasets', handleDatasetNameMessage);
-  }, []);
 
   return (
     <>
       <Button
         variant="contained"
         color="primary"
-        onClick={handleFolderSelectButtonClick}
+        onClick={openDefaultDatasetSavePath}
       >
         Select default save location
       </Button>
       <Typography gutterBottom>
         {selectedFolderPath || 'No folder selected'}
       </Typography>
+
       {selectedFolderPath && (
         <Button
           variant="contained"
           color="primary"
-          onClick={handleAddDatasetsButtonClick}
+          onClick={openGenerateTestDatasetConfigDialogue}
         >
           Add dataset
         </Button>
       )}
-
       <FolderSelectDialog
         open={folderSelectOpen}
         onClose={handleFolderSelectClose}
-        onFolderSelectButtonClick={handleFolderSelectButtonClick}
+        onFolderSelectButtonClick={openDefaultDatasetSavePath}
         selectedFolderPath={selectedFolderPath}
         handleDatasetCustomizationOpen={handleDatasetCustomizationOpen}
       />
@@ -143,13 +142,6 @@ function GenerateTestDatasetHome() {
           ))}
         </List>
       </Grid>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleGetDatasetsButtonClick}
-      >
-        Get datasets
-      </Button>
     </>
   );
 }

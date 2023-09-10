@@ -148,8 +148,8 @@ export default function AppContainer({ children }: AppContainerProps) {
         <Divider />
         <List>
           {['Administrate', 'Curate', 'Generate test dataset'].map((text) => (
-            <Link to={text.replace(/ /g, '-').toLowerCase()}>
-              <ListItem key={text} disablePadding>
+            <Link key={text} to={text.replace(/ /g, '-').toLowerCase()}>
+              <ListItem disablePadding>
                 <ListItemButton>
                   <ListItemIcon>{iconMapping[text]}</ListItemIcon>
                   <ListItemText primary={text} />
