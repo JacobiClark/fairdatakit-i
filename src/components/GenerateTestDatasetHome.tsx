@@ -39,31 +39,45 @@ function GenerateTestDatasetHome() {
 
   useEffect(() => {
     // IPC Event Handler to set the selected folder path
-    const setTestDatasetSavePath = (selectedDatasetPath: String) => {
+    const setTestDatasetSavePath = (selectedDatasetPath) => {
       setSelectedFolderPath(selectedDatasetPath);
     };
 
     window.electron.ipcRenderer.on(
-      'open-single-folder-select-test-dataset-save-path',
+      'open-single-folder-select-test-dataset-save-path-success',
       setTestDatasetSavePath
     );
   }, []);
 
   useEffect(() => {
-    // Get the default test dataset path from main and set it
-    const getTestDatasetSavePath = () => {
-      window.electron.ipcRenderer.sendMessage('get-test-dataset-save-path', []);
+    // Send the IPC message to the main process
+    window.electron.ipcRenderer.sendMessage('get-test-dataset-save-path', []);
+
+    // Register the event listener and get the cleanup function
+    const unsubscribe = window.electron.ipcRenderer.on(
+      'get-test-dataset-save-path-reply',
+      (folderPath) => {
+        // Handle the IPC message here
+        setSelectedFolderPath(folderPath);
+      }
+    );
+
+    // Cleanup: Remove the event listener when the component unmounts
+    return () => {
+      console.log("Removing 'get-test-dataset-save-path-reply' listener");
+      unsubscribe(); // Call the cleanup function to unsubscribe
     };
+  }, []);
 
-    getTestDatasetSavePath();
-
-    const setTestDatasetSavePath = (args) => {
-      setSelectedFolderPath(args);
+  useEffect(() => {
+    // Get the default test dataset path from main and set it
+    const handleMessage = (res) => {
+      console.log(data);
     };
 
     window.electron.ipcRenderer.on(
-      'get-test-dataset-save-path',
-      setTestDatasetSavePath
+      'generate-test-dataset-success',
+      handleMessage
     );
   }, []);
 

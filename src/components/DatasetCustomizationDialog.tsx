@@ -28,32 +28,27 @@ function DatasetCustomizationDialog({
   onClose,
 }: DatasetCustomizationDialogProps) {
   const { control, handleSubmit, reset, watch } = useForm();
-  const [totalSize, setTotalSize] = useState(0); // Initialize total size to 0
+  const formData = watch();
 
-  // Calculate the total size based on user selections
-  const calculateTotalSize = () => {
-    const formData = watch();
-    console.log(formData);
-    const numberOfFolders = formData.numberOfFolders || 0;
-    const numberOfFilesPerFolder = formData.numberOfFilesPerFolder || 0;
-    const sizePerFile = formData.sizePerFile || 0;
+  console.log(JSON.stringify(formData, null, 2));
 
-    // Calculate the total size
-    const totalSize = numberOfFolders * numberOfFilesPerFolder * sizePerFile;
-    setTotalSize(totalSize);
-  };
-
-  useEffect(() => {
-    // Call the calculateTotalSize function when the component mounts
-    calculateTotalSize();
-  }, []); // Empty dependency array to run it only once on mount
+  const numberOfFoldersPerFolder = formData.numberOfFoldersPerFolder || 0;
+  const numberOfFilesPerFolder = formData.numberOfFilesPerFolder || 0;
+  const sizePerFile = formData.sizePerFile || 0;
+  const totalDatasetSize =
+    numberOfFoldersPerFolder * numberOfFilesPerFolder * sizePerFile;
 
   const onSubmit = (data: any) => {
-    console.log(data);
-    // Add your form submission logic here
-    // You can also close the dialog if needed
+    window.electron.ipcRenderer.sendMessage('generate-test-dataset', data);
     onClose();
   };
+
+  // Reset the form when the dialog is closed
+  useEffect(() => {
+    if (!open) {
+      reset();
+    }
+  }, [open]);
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -86,7 +81,7 @@ function DatasetCustomizationDialog({
               )}
             />
             <Controller
-              name="numberOfFolders"
+              name="numberOfFoldersPerFolder"
               control={control}
               defaultValue={0}
               render={({ field }) => (
@@ -159,7 +154,9 @@ function DatasetCustomizationDialog({
               )}
             />
 
-            <Typography variant="body2">Total Size: {totalSize} MB</Typography>
+            <Typography variant="body2">
+              Total Size: {totalDatasetSize} MB
+            </Typography>
 
             <Controller
               name="includeHiddenFiles"

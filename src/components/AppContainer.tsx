@@ -152,7 +152,7 @@ export default function AppContainer({ children }: AppContainerProps) {
               <ListItem disablePadding>
                 <ListItemButton>
                   <ListItemIcon>{iconMapping[text]}</ListItemIcon>
-                  <ListItemText primary={text} />
+                  <ListItemText />
                 </ListItemButton>
               </ListItem>
             </Link>

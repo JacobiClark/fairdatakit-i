@@ -22,6 +22,7 @@ import {
   setDefaultTestDatasetPath,
   getDefaultTestDatasetPath,
 } from '../stores/userConfig';
+import { get } from 'http';
 
 class AppUpdater {
   constructor() {
@@ -96,8 +97,13 @@ const generateTreeStructure = (folderPath) => {
 };
 
 ipcMain.on('get-test-dataset-save-path', async (event) => {
-  const testDatasetSavePath = userConfig.get('testDatasetSavePath');
-  event.reply('get-test-dataset-save-path', testDatasetSavePath);
+  console.log('get-test-dataset-save-path');
+  try {
+    const testDatasetSavePath = getDefaultTestDatasetPath();
+    event.reply('get-test-dataset-save-path-reply', testDatasetSavePath);
+  } catch (error) {
+    event.reply('get-test-dataset-save-path-error', { error });
+  }
 });
 
 ipcMain.on('open-folder-dialog', async (event, args) => {
@@ -116,8 +122,9 @@ ipcMain.on(
       properties: ['openDirectory'],
     });
     setDefaultTestDatasetPath(result.filePaths[0]);
+    console.log(getDefaultTestDatasetPath());
     event.reply(
-      `open-single-folder-select-test-dataset-save-path`,
+      `open-single-folder-select-test-dataset-save-path-success`,
       result.filePaths[0]
     );
   }
@@ -126,6 +133,15 @@ ipcMain.on(
 ipcMain.on('get-test-dataset-save-path', async (event) => {
   const testDaasetPath = getDefaultTestDatasetPath();
   event.reply('get-test-dataset-save-path', testDaasetPath);
+});
+
+ipcMain.on('generate-test-dataset', async (event, datasetConfig) => {
+  console.log(datasetConfig);
+  try {
+    event.reply('generate-test-dataset-success', { datasetConfig });
+  } catch (error) {
+    event.reply('response-channel-error', { error });
+  }
 });
 
 ipcMain.handle('show-open-dialog', async (event, options) => {
