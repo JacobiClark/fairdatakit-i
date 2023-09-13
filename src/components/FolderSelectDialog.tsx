@@ -1,14 +1,5 @@
 import React from 'react';
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Box,
-  Typography,
-} from '@mui/material';
+import { Modal, Button, Group, Text, Flex } from '@mantine/core';
 
 type FolderSelectDialogProps = {
   open: boolean; // Whether the dialog is open
@@ -26,36 +17,31 @@ function FolderSelectDialog({
   handleDatasetCustomizationOpen,
 }: FolderSelectDialogProps) {
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Select dataset location</DialogTitle>
-      <DialogContent>
-        <DialogContentText>
-          Select the local path where you would like to generate the dataset to
-        </DialogContentText>
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          flexDirection="column"
-        >
-          <Button
-            sx={{ m: 3 }}
-            variant="contained"
-            color="primary"
-            onClick={onFolderSelectButtonClick}
-          >
-            Select save path
-          </Button>
-          <Typography>{JSON.stringify(selectedFolderPath)}</Typography>
-        </Box>
-      </DialogContent>
-      <DialogActions>
+    <Modal
+      opened={open}
+      onClose={onClose}
+      title="  Select the local path where you would like to generate the dataset to"
+    >
+      <Flex
+        mih={50}
+        bg="rgba(0, 0, 0, .3)"
+        gap="md"
+        justify="center"
+        align="center"
+        direction="column"
+        wrap="wrap"
+      >
+        <Button onClick={onFolderSelectButtonClick}>Select save path</Button>
+        <Text>{JSON.stringify(selectedFolderPath)}</Text>
+      </Flex>
+      <Button onClick={handleDatasetCustomizationOpen}>Generate dataset</Button>
+      <Group>
         <Button onClick={handleDatasetCustomizationOpen}>
           Generate dataset
         </Button>
         <Button onClick={onClose}>Cancel</Button>
-      </DialogActions>
-    </Dialog>
+      </Group>
+    </Modal>
   );
 }
 

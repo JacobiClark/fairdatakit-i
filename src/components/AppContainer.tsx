@@ -4,9 +4,6 @@ import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 import { IconFolderPlus } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
-
-import CustonNavBar from './CustomNavBar';
-
 import {
   AppShell,
   Navbar,
@@ -16,6 +13,8 @@ import {
   Burger,
   useMantineTheme,
 } from '@mantine/core';
+
+import CustonNavBar from './CustomNavBar';
 
 const drawerWidth = 240;
 

@@ -1,15 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '@mui/material';
-import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
-import FolderIcon from '@mui/icons-material/Folder';
-import DeleteIcon from '@mui/icons-material/Delete';
-import IconButton from '@mui/material/IconButton';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import Avatar from '@mui/material/Avatar';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
-import ListItemText from '@mui/material/ListItemText';
+import { Button } from '@mantine/core';
+import { Text } from '@mantine/core';
 import FolderSelectDialog from './FolderSelectDialog';
 import DatasetCustomizationDialog from './DatasetCustomizationDialog';
 
@@ -96,23 +87,13 @@ function GenerateTestDatasetHome() {
 
   return (
     <>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={openDefaultDatasetSavePath}
-      >
+      <Button color="cyan" onClick={openDefaultDatasetSavePath}>
         Select default save location
       </Button>
-      <Typography gutterBottom>
-        {selectedFolderPath || 'No folder selected'}
-      </Typography>
+      <Text>{selectedFolderPath || 'No folder selected'}</Text>
 
       {selectedFolderPath && (
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={openGenerateTestDatasetConfigDialogue}
-        >
+        <Button onClick={openGenerateTestDatasetConfigDialogue}>
           Add dataset
         </Button>
       )}
@@ -129,33 +110,6 @@ function GenerateTestDatasetHome() {
       />
 
       <h1>Current datasets</h1>
-      <Grid item xs={12} md={6}>
-        <Typography sx={{ mt: 4, mb: 2 }} variant="h6" component="div">
-          Avatar with text and icon
-        </Typography>
-        <List>
-          {dummyDatasets.map((dataset) => (
-            <ListItem
-              key={dataset.name}
-              secondaryAction={
-                <IconButton edge="end" aria-label="delete">
-                  <DeleteIcon />
-                </IconButton>
-              }
-            >
-              <ListItemAvatar>
-                <Avatar>
-                  <FolderIcon />
-                </Avatar>
-              </ListItemAvatar>
-              <ListItemText
-                primary={dataset.name}
-                secondary={dataset.description}
-              />
-            </ListItem>
-          ))}
-        </List>
-      </Grid>
     </>
   );
 }

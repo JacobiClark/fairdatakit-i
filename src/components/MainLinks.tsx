@@ -60,7 +60,7 @@ const data = [
     icon: <IconAlertCircle size="1rem" />,
     color: 'teal',
     label: 'Open Issues',
-    linkTo: '/pull-requests',
+    linkTo: '/curate',
   },
   {
     icon: <IconMessages size="1rem" />,
