@@ -78,16 +78,6 @@ function DatasetForm() {
       <button type="button" onClick={handleSendMessage}>
         Send IPC Message
       </button>
-      <Menu
-        id="context-menu"
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-      >
-        <MenuItem onClick={handleClose}>Option 1</MenuItem>
-        <MenuItem onClick={handleClose}>Option 2</MenuItem>
-        <MenuItem onClick={handleClose}>Option 3</MenuItem>
-      </Menu>
     </>
   );
 }

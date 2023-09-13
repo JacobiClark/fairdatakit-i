@@ -4,7 +4,7 @@ import MetadataForm from '../components/MetadataForm';
 import FileExplorer from '../components/FileExplorer';
 import CurateHome from '../components/CurateHome';
 import GenerateTestDatasetHome from '../components/GenerateTestDatasetHome';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { MantineProvider } from '@mantine/core';
 import theme from '../utils/theme';
 
 import './App.css';
@@ -12,7 +12,7 @@ import DatasetForm from 'components/DatasetForm';
 
 export default function App() {
   return (
-    <ThemeProvider theme={theme}>
+    <MantineProvider withGlobalStyles withNormalizeCSS>
       <Router>
         <AppContainer>
           <Routes>
@@ -28,6 +28,6 @@ export default function App() {
           </Routes>
         </AppContainer>
       </Router>
-    </ThemeProvider>
+    </MantineProvider>
   );
 }
