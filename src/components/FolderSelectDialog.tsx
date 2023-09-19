@@ -18,9 +18,11 @@ function FolderSelectDialog({
 }: FolderSelectDialogProps) {
   return (
     <Modal
-      opened={open}
+      opened={!open}
       onClose={onClose}
       title="  Select the local path where you would like to generate the dataset to"
+      size="md"
+      centered
     >
       <Flex
         mih={50}
